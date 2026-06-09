@@ -1,7 +1,10 @@
-project(lifelong)
-
 cmake_minimum_required(VERSION 3.16)
+project(lifelong LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
+
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)
+endif()
 
 # Set the default value of PYTHON to false
 option(PYTHON "Enable Python" OFF)
@@ -33,12 +36,14 @@ list(FILTER SOURCES EXCLUDE REGEX ".*/src/tcp_server_main\\.cpp$")
 list(FILTER SOURCES EXCLUDE REGEX ".*/src/PibtTcpServer\\.cpp$")
 list(FILTER SOURCES EXCLUDE REGEX ".*/src/UnityStartKitAdapter\\.cpp$")
 list(FILTER SOURCES EXCLUDE REGEX ".*/src/PlannerSession\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX ".*/src/epibt_smoke_main\\.cpp$")
 
 
 # Find Boost
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 #SET(Boost_USE_STATIC_LIBS ON)
-find_package( Boost 1.49.0 REQUIRED COMPONENTS program_options system filesystem log log_setup)
+set(Boost_NO_BOOST_CMAKE ON)
+find_package( Boost 1.49.0 REQUIRED COMPONENTS program_options filesystem log log_setup)
 
 include_directories( ${Boost_INCLUDE_DIRS} )
 
@@ -64,7 +69,7 @@ IF(PYTHON)
 
     add_executable(lifelong  ${PY_SOURCES} ${SOURCES})
     target_link_libraries(lifelong PRIVATE pybind11::embed ${Boost_LIBRARIES})
-    target_compile_definitions(lifelong PRIVATE PYTHON=${PYTHON_FLAG})
+    target_compile_definitions(lifelong PRIVATE BOOST_ERROR_CODE_HEADER_ONLY PYTHON=${PYTHON_FLAG})
 
     if (COPY_PY_PATH_CONFIG)
         file(COPY "config.json" DESTINATION ${CMAKE_BINARY_DIR})
@@ -77,7 +82,7 @@ ELSE()
 
     add_executable(lifelong ${SOURCES} )
     target_link_libraries(lifelong ${Boost_LIBRARIES})
-    target_compile_definitions(lifelong PRIVATE PYTHON=${PYTHON_FLAG})
+    target_compile_definitions(lifelong PRIVATE BOOST_ERROR_CODE_HEADER_ONLY PYTHON=${PYTHON_FLAG})
 ENDIF()
 
 # ── pibt_tcp_server (Sprint 05: links DefaultPlanner + adapter) ──────────────
@@ -87,6 +92,7 @@ file(GLOB TCP_PLANNER_SOURCES "default_planner/*.cpp")
 add_executable(
     pibt_tcp_server
     src/tcp_server_main.cpp
+    src/FileLogger.cpp
     src/PibtTcpServer.cpp
     src/PlannerSession.cpp
     src/UnityStartKitAdapter.cpp
@@ -98,7 +104,20 @@ add_executable(
 )
 target_include_directories(pibt_tcp_server PRIVATE inc default_planner ${Boost_INCLUDE_DIRS})
 target_link_libraries(pibt_tcp_server PRIVATE ${Boost_LIBRARIES})
-target_compile_definitions(pibt_tcp_server PRIVATE PYTHON=${PYTHON_FLAG})
+target_compile_definitions(pibt_tcp_server PRIVATE BOOST_ERROR_CODE_HEADER_ONLY PYTHON=${PYTHON_FLAG})
+
+add_executable(
+    epibt_smoke_test
+    src/epibt_smoke_main.cpp
+    src/States.cpp
+    src/common.cpp
+    default_planner/utils.cpp
+    default_planner/heuristics.cpp
+    default_planner/epibt.cpp
+)
+target_include_directories(epibt_smoke_test PRIVATE inc default_planner ${Boost_INCLUDE_DIRS})
+target_link_libraries(epibt_smoke_test PRIVATE ${Boost_LIBRARIES})
+target_compile_definitions(epibt_smoke_test PRIVATE BOOST_ERROR_CODE_HEADER_ONLY PYTHON=${PYTHON_FLAG})
 
 
 add_custom_target(clean_all
@@ -115,4 +134,3 @@ set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES
      ${CMAKE_BINARY_DIR}/build;
      ${CMAKE_BINARY_DIR}/*.so"
 )
-

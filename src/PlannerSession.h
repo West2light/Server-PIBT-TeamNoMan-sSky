@@ -16,6 +16,12 @@
 
 using json = nlohmann::json;
 
+enum class PlannerMode
+{
+    DefaultPlanner,
+    Epibt
+};
+
 class PlannerSession
 {
 public:
@@ -34,10 +40,23 @@ public:
 
     bool IsInitialized() const { return initialized_; }
     const std::string& SessionId() const { return session_id_; }
+    PlannerMode GetPlannerMode() const { return planner_mode_; }
+    const std::string& PlannerName() const { return planner_name_; }
 
 private:
+    struct ActionTrace
+    {
+        std::string operation;
+        int opIndex = 0;
+        std::string debugReason;
+    };
+
+    ActionTrace BuildDefaultTrace(Action action) const;
+
     std::string         session_id_;
     bool                initialized_ = false;
+    PlannerMode         planner_mode_ = PlannerMode::DefaultPlanner;
+    std::string         planner_name_ = "DefaultPlanner";
     SharedEnvironment   env_;
     int                 request_counter_ = 0;
 };

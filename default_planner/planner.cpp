@@ -5,6 +5,9 @@
 #include "flow.h"
 #include "const.h"
 
+#include <cstdlib>
+#include <new>
+
 
 namespace DefaultPlanner{
 
@@ -24,9 +27,41 @@ namespace DefaultPlanner{
     TrajLNS trajLNS;
     std::mt19937 mt1;
 
+    namespace
+    {
+        void ResetPlannerGlobals()
+        {
+            decision.clear();
+            prev_decision.clear();
+            p.clear();
+            prev_states.clear();
+            next_states.clear();
+            ids.clear();
+            p_copy.clear();
+            occupied.clear();
+            decided.clear();
+            checked.clear();
+            require_guide_path.clear();
+            dummy_goals.clear();
+            global_heuristictable.clear();
+            global_neighbors.clear();
+            mt1.seed(0);
+            srand(0);
+
+            trajLNS.~TrajLNS();
+            new (&trajLNS) TrajLNS();
+        }
+    }
+
+    void reset()
+    {
+        ResetPlannerGlobals();
+    }
         
     void initialize(int preprocess_time_limit, SharedEnvironment* env){
-        // cout<<"plan initiallize limit "<< preprocess_time_limit<<endl;
+            ResetPlannerGlobals();
+
+            // cout<<"plan initiallize limit "<< preprocess_time_limit<<endl;
             assert(env->num_of_agents != 0);
             p.assign(env->num_of_agents, 0.0);
             p_copy.assign(env->num_of_agents, 0.0);
@@ -45,8 +80,6 @@ namespace DefaultPlanner{
             }
 
             init_heuristics(env);
-            mt1.seed(0);
-            srand(0);
 
             trajLNS.~TrajLNS();
             new (&trajLNS) TrajLNS(env, global_heuristictable, global_neighbors);
