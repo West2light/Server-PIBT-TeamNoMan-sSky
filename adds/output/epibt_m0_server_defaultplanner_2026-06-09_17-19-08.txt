@@ -1,0 +1,18 @@
+2026-06-09 17:19:08.343 [INFO] [FileLogger] initialized path=adds/output/epibt_m0_server_defaultplanner_2026-06-09_17-19-08.txt
+2026-06-09 17:19:08.343 [INFO] [PibtTcpServer] listening host=127.0.0.1 port=7789 planner=DefaultPlanner logPath=adds/output/epibt_m0_server_defaultplanner_2026-06-09_17-19-08.txt
+2026-06-09 17:19:25.089 [INFO] [PibtTcpServer] client connected
+2026-06-09 17:19:25.091 [INFO] [PibtTcpServer] hello session=m5-default teamSize=1
+2026-06-09 17:19:25.091 [INFO] [PlannerSession] initialize begin session=m5-default preprocessMs=3000
+2026-06-09 17:19:25.091 [INFO] [PlannerSession] initialize ok session=m5-default agents=1 map=2x1 planner=DefaultPlanner
+2026-06-09 17:19:25.093 [INFO] [PibtTcpServer] plan_step session=m5-default requestId=1 agents=1
+2026-06-09 17:19:25.093 [INFO] [PlannerSession] plan begin session=m5-default requestId=1 timestep=0
+2026-06-09 17:19:25.173 [INFO] [PlannerSession] plan ok session=m5-default requestId=1 timestep=0 agents=1 computeMs=80.008078 planner=DefaultPlanner timeout=false
+2026-06-09 17:19:25.175 [INFO] [PibtTcpServer] shutdown session=m5-default
+2026-06-09 17:19:25.175 [INFO] [PibtTcpServer] client connected
+2026-06-09 17:19:25.175 [INFO] [PibtTcpServer] hello session=m5-epibt teamSize=1
+2026-06-09 17:19:25.175 [INFO] [PlannerSession] initialize begin session=m5-epibt preprocessMs=3000
+2026-06-09 17:19:25.175 [INFO] [PlannerSession] initialize ok session=m5-epibt agents=1 map=2x1 planner=EPIBT3
+2026-06-09 17:19:25.177 [INFO] [PibtTcpServer] plan_step session=m5-epibt requestId=1 agents=1
+2026-06-09 17:19:25.177 [INFO] [PlannerSession] plan begin session=m5-epibt requestId=1 timestep=0
+2026-06-09 17:19:25.177 [INFO] [PlannerSession] plan ok session=m5-epibt requestId=1 timestep=0 agents=1 computeMs=0.013015 planner=EPIBT3 timeout=false
+2026-06-09 17:19:25.179 [INFO] [PibtTcpServer] shutdown session=m5-epibt

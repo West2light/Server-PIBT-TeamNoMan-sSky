@@ -1,0 +1,2 @@
+2026-06-09 16:49:37.921 [INFO] [FileLogger] initialized path=adds/output/epibt_m0_server_defaultplanner_2026-06-09_16-49-37.txt
+2026-06-09 16:49:37.922 [ERROR] [PibtTcpServer] fatal error: bind: Address already in use [system:98 at /usr/include/boost/asio/detail/reactive_socket_service.hpp:161 in function 'bind']

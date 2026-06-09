@@ -1,0 +1,61 @@
+2026-06-09 16:51:43.988 [INFO] [FileLogger] initialized path=adds/output/epibt_m0_server_defaultplanner_2026-06-09_16-51-43.txt
+2026-06-09 16:51:43.988 [INFO] [PibtTcpServer] listening host=127.0.0.1 port=7777 planner=DefaultPlanner logPath=adds/output/epibt_m0_server_defaultplanner_2026-06-09_16-51-43.txt
+2026-06-09 16:51:55.267 [INFO] [PibtTcpServer] client connected
+2026-06-09 16:51:55.270 [INFO] [PibtTcpServer] hello session=2d2d3d1d teamSize=6
+2026-06-09 16:51:55.270 [INFO] [PlannerSession] initialize begin session=2d2d3d1d preprocessMs=3000
+2026-06-09 16:51:55.270 [INFO] [PlannerSession] initialize ok session=2d2d3d1d agents=6 map=32x32
+2026-06-09 16:51:55.921 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=1 agents=6
+2026-06-09 16:51:55.921 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=1 timestep=1
+2026-06-09 16:51:56.002 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=1 timestep=1 agents=6 computeMs=80.029952 timeout=false
+2026-06-09 16:51:56.666 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=2 agents=6
+2026-06-09 16:51:56.666 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=2 timestep=8
+2026-06-09 16:51:56.746 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=2 timestep=8 agents=6 computeMs=80.009433 timeout=false
+2026-06-09 16:51:57.416 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=3 agents=6
+2026-06-09 16:51:57.416 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=3 timestep=16
+2026-06-09 16:51:57.496 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=3 timestep=16 agents=6 computeMs=80.019980 timeout=false
+2026-06-09 16:51:58.168 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=4 agents=6
+2026-06-09 16:51:58.168 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=4 timestep=23
+2026-06-09 16:51:58.248 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=4 timestep=23 agents=6 computeMs=80.018436 timeout=false
+2026-06-09 16:51:58.920 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=5 agents=6
+2026-06-09 16:51:58.920 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=5 timestep=31
+2026-06-09 16:51:59.000 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=5 timestep=31 agents=6 computeMs=80.018445 timeout=false
+2026-06-09 16:51:59.670 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=6 agents=6
+2026-06-09 16:51:59.670 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=6 timestep=38
+2026-06-09 16:51:59.750 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=6 timestep=38 agents=6 computeMs=80.014210 timeout=false
+2026-06-09 16:52:00.420 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=7 agents=6
+2026-06-09 16:52:00.420 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=7 timestep=46
+2026-06-09 16:52:00.500 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=7 timestep=46 agents=6 computeMs=80.029088 timeout=false
+2026-06-09 16:52:01.171 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=8 agents=6
+2026-06-09 16:52:01.171 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=8 timestep=53
+2026-06-09 16:52:01.251 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=8 timestep=53 agents=6 computeMs=80.013077 timeout=false
+2026-06-09 16:52:01.921 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=9 agents=6
+2026-06-09 16:52:01.922 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=9 timestep=61
+2026-06-09 16:52:02.002 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=9 timestep=61 agents=6 computeMs=80.021356 timeout=false
+2026-06-09 16:52:02.671 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=10 agents=6
+2026-06-09 16:52:02.672 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=10 timestep=68
+2026-06-09 16:52:02.752 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=10 timestep=68 agents=6 computeMs=80.013099 timeout=false
+2026-06-09 16:52:03.423 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=11 agents=6
+2026-06-09 16:52:03.423 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=11 timestep=76
+2026-06-09 16:52:03.504 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=11 timestep=76 agents=6 computeMs=80.021327 timeout=false
+2026-06-09 16:52:04.175 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=12 agents=6
+2026-06-09 16:52:04.175 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=12 timestep=83
+2026-06-09 16:52:04.255 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=12 timestep=83 agents=6 computeMs=80.055114 timeout=false
+2026-06-09 16:52:04.925 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=13 agents=6
+2026-06-09 16:52:04.925 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=13 timestep=91
+2026-06-09 16:52:05.005 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=13 timestep=91 agents=6 computeMs=80.014459 timeout=false
+2026-06-09 16:52:05.408 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=14 agents=6
+2026-06-09 16:52:05.408 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=14 timestep=96
+2026-06-09 16:52:05.488 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=14 timestep=96 agents=6 computeMs=80.023985 timeout=false
+2026-06-09 16:52:06.161 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=15 agents=6
+2026-06-09 16:52:06.161 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=15 timestep=103
+2026-06-09 16:52:06.242 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=15 timestep=103 agents=6 computeMs=80.011007 timeout=false
+2026-06-09 16:52:46.252 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=16 agents=6
+2026-06-09 16:52:46.252 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=16 timestep=111
+2026-06-09 16:52:46.332 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=16 timestep=111 agents=6 computeMs=80.015569 timeout=false
+2026-06-09 16:52:47.003 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=17 agents=6
+2026-06-09 16:52:47.003 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=17 timestep=118
+2026-06-09 16:52:47.083 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=17 timestep=118 agents=6 computeMs=80.014960 timeout=false
+2026-06-09 16:52:47.754 [INFO] [PibtTcpServer] plan_step session=2d2d3d1d requestId=18 agents=6
+2026-06-09 16:52:47.754 [INFO] [PlannerSession] plan begin session=2d2d3d1d requestId=18 timestep=126
+2026-06-09 16:52:47.834 [INFO] [PlannerSession] plan ok session=2d2d3d1d requestId=18 timestep=126 agents=6 computeMs=80.011819 timeout=false
+2026-06-09 16:52:48.129 [INFO] [PibtTcpServer] shutdown session=2d2d3d1d
