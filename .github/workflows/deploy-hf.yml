@@ -86,19 +86,18 @@ jobs:
           echo "📝 Thêm YAML Frontmatter vào đầu README.md cho Hugging Face Spaces..."
           # Đọc nội dung cũ của README
           OLD_README=$(cat README.md || echo "")
-          # Viết đè block config bắt buộc
-          cat <<EOF > README.md
-          ---
-          title: MAPF Server PIBT
-          emoji: 🤖
-          colorFrom: blue
-          colorTo: indigo
-          sdk: docker
-          app_file: app.py
-          pinned: false
-          ---
-          
-          EOF
+          # Viết đè block config bắt buộc (KHÔNG lùi đầu dòng)
+          cat > README.md << 'EOF'
+---
+title: MAPF Server PIBT
+emoji: 🤖
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+---
+
+EOF
           # Nối nội dung cũ vào dưới block cấu hình
           echo "$OLD_README" >> README.md
           
