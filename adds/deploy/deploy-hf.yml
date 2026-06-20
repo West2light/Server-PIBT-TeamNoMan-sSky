@@ -83,6 +83,25 @@ jobs:
           echo "🗑️ Xóa thư mục .git cũ và các file binary không cần thiết để tránh lỗi push từ HF..."
           rm -rf .git/ image/ adds/ plot.ipynb
           
+          echo "📝 Thêm YAML Frontmatter vào đầu README.md cho Hugging Face Spaces..."
+          # Đọc nội dung cũ của README
+          OLD_README=$(cat README.md || echo "")
+          # Viết đè block config bắt buộc
+          cat <<EOF > README.md
+          ---
+          title: MAPF Server PIBT
+          emoji: 🤖
+          colorFrom: blue
+          colorTo: indigo
+          sdk: docker
+          app_file: app.py
+          pinned: false
+          ---
+          
+          EOF
+          # Nối nội dung cũ vào dưới block cấu hình
+          echo "$OLD_README" >> README.md
+          
           echo "🔄 Khởi tạo git repo mới (1 commit duy nhất)..."
           git init
           git checkout -b main
