@@ -1,0 +1,142 @@
+# ============================================================
+# GitHub Actions Workflow – Deploy to Hugging Face Space
+# File: .github/workflows/deploy-hf.yml
+# ============================================================
+#
+# SECRETS cần cấu hình ở GitHub repo
+#   (Settings → Secrets and variables → Actions → New repository secret):
+#
+#   HF_TOKEN    : Hugging Face Access Token (loại Write)
+#                 Lấy tại: https://huggingface.co/settings/tokens
+#   HF_SPACE_ID : "{username}/{space-name}" — ví dụ: west2light/server-pibt
+#
+# ============================================================
+
+name: 🚀 Deploy to Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "adds/**"      # Không trigger khi chỉ sửa tài liệu nội bộ
+      - "**.md"
+      - ".gitignore"
+
+  workflow_dispatch:   # Trigger thủ công từ GitHub UI
+    inputs:
+      force_deploy:
+        description: "Force deploy (bỏ qua paths-ignore)"
+        required: false
+        default: "false"
+
+jobs:
+  # ──────────────────────────────────────────────────────────
+  # JOB 1: Kiểm tra file bắt buộc
+  # ──────────────────────────────────────────────────────────
+  validate:
+    name: 🔍 Validate files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Kiểm tra file bắt buộc tồn tại
+        run: |
+          echo "Kiểm tra các file bắt buộc của HF Docker Space..."
+          MISSING=0
+          for f in Dockerfile app.py; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Thiếu file bắt buộc: $f"
+              MISSING=$((MISSING+1))
+            else
+              echo "✅ $f"
+            fi
+          done
+          [ $MISSING -eq 0 ] || exit 1
+
+      - name: Kiểm tra Dockerfile có FROM và EXPOSE 7860
+        run: |
+          grep -q "^FROM" Dockerfile   || { echo "::error::Dockerfile thiếu FROM"; exit 1; }
+          grep -q "EXPOSE 7860" Dockerfile || { echo "::error::Dockerfile phải có EXPOSE 7860 (HF bắt buộc)"; exit 1; }
+          echo "✅ Dockerfile hợp lệ"
+
+  # ──────────────────────────────────────────────────────────
+  # JOB 2: Deploy lên Hugging Face Space
+  # ──────────────────────────────────────────────────────────
+  deploy:
+    name: 🤗 Push to HF Space
+    runs-on: ubuntu-latest
+    needs: validate      # Chỉ deploy nếu validate pass
+
+    steps:
+      - name: Checkout code (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # Cần full history để git push lên HF
+
+      - name: Cấu hình Git identity
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name  "github-actions[bot]"
+
+      - name: Thêm HF Space làm git remote
+        env:
+          HF_TOKEN:    ${{ secrets.HF_TOKEN }}
+          HF_SPACE_ID: ${{ secrets.HF_SPACE_ID }}
+        run: |
+          # URL format: https://user:<token>@huggingface.co/spaces/<space-id>
+          HF_REMOTE="https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_ID}"
+          git remote add hf_space "$HF_REMOTE" \
+            || git remote set-url hf_space "$HF_REMOTE"
+          echo "✅ Remote hf_space đã cấu hình → ${HF_SPACE_ID}"
+
+      - name: Push code lên HF Space
+        run: |
+          echo "📤 Đang push lên HF Space (--force để overwrite)..."
+          git push hf_space HEAD:main --force
+          echo "✅ Push thành công! HF Space bắt đầu rebuild Docker image."
+
+      - name: Chờ Space build xong và health check
+        env:
+          HF_SPACE_ID: ${{ secrets.HF_SPACE_ID }}
+        run: |
+          # Build C++ trên Free CPU mất 10–20 phút → chờ tối đa 20 phút
+          MAX_WAIT=1200
+          INTERVAL=30
+          ELAPSED=0
+          # URL format: username-spacename.hf.space
+          SPACE_URL="https://${HF_SPACE_ID/\//-}.hf.space/health"
+          echo "⏳ Polling $SPACE_URL (tối đa ${MAX_WAIT}s, interval ${INTERVAL}s)..."
+
+          while [ $ELAPSED -lt $MAX_WAIT ]; do
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SPACE_URL" || echo "000")
+            echo "  [${ELAPSED}s] HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Space running (HTTP 200) sau ${ELAPSED}s"
+              exit 0
+            fi
+          done
+
+          echo "⚠️  Space chưa trả HTTP 200 sau ${MAX_WAIT}s."
+          echo "    Có thể Space vẫn đang build — kiểm tra thủ công tab App."
+          # Không exit 1 để không fail cả job vì build lâu là bình thường
+
+      - name: Ghi Deploy Summary
+        if: always()
+        env:
+          HF_SPACE_ID: ${{ secrets.HF_SPACE_ID }}
+        run: |
+          echo "## 🚀 Deploy Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| | |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Space** | \`${HF_SPACE_ID}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Commit** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Branch** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered by** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Thời gian** | $(date -u '+%Y-%m-%d %H:%M UTC') |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Space URL** | https://${HF_SPACE_ID/\//-}.hf.space |" >> $GITHUB_STEP_SUMMARY
