@@ -16,4 +16,4 @@ __pycache__/
 *.exe
 *.out
 
-python/tmp/
+python/tmp/adds/output/

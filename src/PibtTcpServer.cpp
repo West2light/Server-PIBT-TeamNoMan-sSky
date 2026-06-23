@@ -55,6 +55,15 @@ json BuildHelloAck(
     r["server"]    = "pibt_tcp_server";
     r["planner"]   = planner_name;
     if (!ok) r["message"] = msg;
+    // F-S2: echo map dims so client (F-U1) can assert what the server received
+    if (request.contains("map") && request["map"].is_object())
+    {
+        const int w = request["map"].value("width",  0);
+        const int h = request["map"].value("height", 0);
+        r["width"]     = w;
+        r["height"]    = h;
+        r["cellCount"] = w * h;
+    }
     return r;
 }
 
@@ -78,17 +87,31 @@ json BuildShutdownAck(const json& request)
     return r;
 }
 
+// S-R2: explicit reset ack — allows reusing a live connection for a new game session
+json BuildResetAck(const json& request)
+{
+    json r;
+    r["type"]      = "reset_ack";
+    r["sessionId"] = request.value("sessionId", "");
+    r["status"]    = "ok";
+    r["message"]   = "session state cleared";
+    return r;
+}
+
 void WriteJsonLine(tcp::socket& socket, const json& payload)
 {
     const std::string body = payload.dump() + "\n";
     boost::asio::write(socket, boost::asio::buffer(body));
 }
 
-void ResetSessionState(std::unique_ptr<PlannerSession>& session)
+// S-R1: single authoritative "wipe all per-game state" function, called on every
+// session boundary (hello / reset / shutdown / EOF). Adding new globals? Add them here.
+void ResetAllSessionState(std::unique_ptr<PlannerSession>& session)
 {
     session.reset();
-    DefaultPlanner::reset();
-    EpibtPlanner::reset();
+    DefaultPlanner::reset();   // ResetPlannerGlobals: clears all namespace globals + reseeds mt1/srand
+    EpibtPlanner::reset();     // ResetState: clears g_operations / g_last_agent_traces / etc.
+    FileLogger::Info("[PibtTcpServer] session state fully reset");
 }
 
 // ─── Per-client session handler ───────────────────────────────────────────────
@@ -108,14 +131,14 @@ void HandleClient(tcp::socket socket)
         {
             std::cout << "[pibt_tcp_server] client disconnected\n";
             FileLogger::Info("[PibtTcpServer] client disconnected");
-            ResetSessionState(session);
+            ResetAllSessionState(session);
             return;
         }
         if (ec)
         {
             std::cerr << "[pibt_tcp_server] read error: " << ec.message() << "\n";
             FileLogger::Error("[PibtTcpServer] socket read error: " + ec.message());
-            ResetSessionState(session);
+            ResetAllSessionState(session);
             return;
         }
 
@@ -151,14 +174,14 @@ void HandleClient(tcp::socket socket)
                 "[PibtTcpServer] hello session=" + sid +
                 " teamSize=" + std::to_string(teamSize));
 
-            ResetSessionState(session);
+            ResetAllSessionState(session);
             session = std::make_unique<PlannerSession>(sid);
             const bool ok = session->Initialize(request, /*preprocess_ms=*/3000);
 
             if (!ok)
             {
                 FileLogger::Error("[PibtTcpServer] hello initialize failed session=" + sid);
-                ResetSessionState(session);
+                ResetAllSessionState(session);
             }
 
             WriteJsonLine(socket, BuildHelloAck(request, ok,
@@ -197,14 +220,37 @@ void HandleClient(tcp::socket socket)
             continue;
         }
 
+        // ── reset (S-R2): reuse live connection for a new game session ───────
+        if (type == "reset")
+        {
+            const std::string sid = request.value("sessionId", "");
+            std::cout << "[pibt_tcp_server] reset session=" << sid << "\n";
+            FileLogger::Info("[PibtTcpServer] reset session=" + sid);
+            ResetAllSessionState(session);
+            // Guard write — client may fire-and-forget without reading the ack
+            try { WriteJsonLine(socket, BuildResetAck(request)); }
+            catch (const std::exception& ex)
+            {
+                std::cerr << "[pibt_tcp_server] reset_ack write error (client already closed?): "
+                          << ex.what() << "\n";
+            }
+            continue;
+        }
+
         // ── shutdown ──────────────────────────────────────────────────────────
         if (type == "shutdown")
         {
             const std::string sid = request.value("sessionId", "");
             std::cout << "[pibt_tcp_server] shutdown session=" << sid << "\n";
             FileLogger::Info("[PibtTcpServer] shutdown session=" + sid);
-            WriteJsonLine(socket, BuildShutdownAck(request));
-            ResetSessionState(session);
+            // Guard write — client may fire-and-forget (C-R2) without reading the ack
+            try { WriteJsonLine(socket, BuildShutdownAck(request)); }
+            catch (const std::exception& ex)
+            {
+                std::cerr << "[pibt_tcp_server] shutdown_ack write error (client already closed?): "
+                          << ex.what() << "\n";
+            }
+            ResetAllSessionState(session);
             return;
         }
 

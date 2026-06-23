@@ -330,11 +330,14 @@ json PlannerSession::Plan(const json& plan_step_msg, int time_limit_ms)
     }
     catch (const std::exception& ex)
     {
-        std::cerr << "[PlannerSession] Plan exception: " << ex.what() << "\n";
+        // F-S3: include map dims to distinguish geometry errors (wrong dims) from other failures
+        std::cerr << "[PlannerSession] Plan exception: " << ex.what()
+                  << " map=" << env_.cols << "x" << env_.rows << "\n";
         FileLogger::Error(
             "[PlannerSession] exception session=" + session_id_ +
             " requestId=" + std::to_string(request_id) +
             " timestep=" + std::to_string(timestep) +
+            " map=" + std::to_string(env_.cols) + "x" + std::to_string(env_.rows) +
             " error=" + ex.what());
         result["errors"].push_back(ex.what());
         result["computeMs"] = 0.0;
