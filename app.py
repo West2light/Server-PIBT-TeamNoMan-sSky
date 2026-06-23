@@ -28,6 +28,7 @@ import json
 import os
 import socket
 import subprocess
+import threading
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -49,6 +50,43 @@ SERVER_PROC: subprocess.Popen | None = None
 # Lock đảm bảo chỉ 1 request TCP tại 1 thời điểm
 # (pibt_tcp_server xử lý tuần tự theo unity_server_guide §7)
 _TCP_LOCK: asyncio.Lock | None = None
+PIBT_SESSION_TTL_SECONDS = int(os.environ.get("PIBT_SESSION_TTL_SECONDS", "300"))
+
+
+class PibtRelayConnection:
+    def __init__(self, tcp_socket: socket.socket):
+        self.socket = tcp_socket
+        self.buffer = bytearray()
+        self.lock = threading.Lock()
+        self.last_used = time.time()
+
+    def exchange(self, payload: str, timeout: float) -> dict[str, Any]:
+        with self.lock:
+            self.last_used = time.time()
+            self.socket.settimeout(timeout)
+            self.socket.sendall(payload.encode("utf-8") + b"\n")
+
+            while b"\n" not in self.buffer:
+                chunk = self.socket.recv(65536)
+                if not chunk:
+                    raise ConnectionError("PIBT server closed the TCP connection")
+                self.buffer.extend(chunk)
+                if len(self.buffer) > 4 * 1024 * 1024:
+                    raise ValueError("PIBT response exceeded 4 MiB")
+
+            line, _, remainder = self.buffer.partition(b"\n")
+            self.buffer = bytearray(remainder)
+            return json.loads(line.rstrip(b"\r").decode("utf-8"))
+
+    def close(self) -> None:
+        try:
+            self.socket.close()
+        except OSError:
+            pass
+
+
+PIBT_CONNECTIONS: dict[str, PibtRelayConnection] = {}
+PIBT_CONNECTIONS_LOCK = threading.Lock()
 
 
 # ─────────────────────────────────────────────────────────────
@@ -108,7 +146,7 @@ app = FastAPI(
         "Dịch REST request sang JSON-over-TCP protocol (unity_server_guide §6). "
         "Client: Unity WebGL tại https://luminx.io.vn"
     ),
-    version="2.1.0",
+    version="2.2.0",
     lifespan=lifespan,
 )
 
@@ -195,6 +233,31 @@ async def _tcp_send_recv(message: dict, timeout: float = 5.0) -> dict:
         return await asyncio.to_thread(_tcp_send_recv_sync, message, timeout)
 
 
+def _remove_pibt_connection(session_id: str) -> None:
+    with PIBT_CONNECTIONS_LOCK:
+        connection = PIBT_CONNECTIONS.pop(session_id, None)
+    if connection is not None:
+        connection.close()
+
+
+def _prune_pibt_connections(max_idle_seconds: int | None = None) -> int:
+    idle_limit = PIBT_SESSION_TTL_SECONDS if max_idle_seconds is None else max_idle_seconds
+    cutoff = time.time() - idle_limit
+    with PIBT_CONNECTIONS_LOCK:
+        expired = [
+            session_id
+            for session_id, connection in PIBT_CONNECTIONS.items()
+            if connection.last_used < cutoff
+        ]
+    for session_id in expired:
+        _remove_pibt_connection(session_id)
+    return len(expired)
+
+
+def _connect_new_pibt_session() -> socket.socket:
+    return socket.create_connection((TCP_HOST, TCP_PORT), timeout=10.0)
+
+
 # ─────────────────────────────────────────────────────────────
 # Pydantic models – theo unity_server_guide.md §6
 # ─────────────────────────────────────────────────────────────
@@ -240,6 +303,10 @@ class ShutdownRequest(BaseModel):
     session_id: str
 
 
+class ResetRequest(BaseModel):
+    session_id: str
+
+
 # ─────────────────────────────────────────────────────────────
 # Endpoints
 # ─────────────────────────────────────────────────────────────
@@ -268,6 +335,7 @@ async def root():
 @app.get("/health")
 async def health():
     """Kiểm tra binary + TCP server + cấu hình CORS."""
+    pruned = _prune_pibt_connections()
     bin_ok = os.path.isfile(PIBT_BIN) and os.access(PIBT_BIN, os.X_OK)
     proc_ok = SERVER_PROC is not None and SERVER_PROC.poll() is None
     tcp_ok = False
@@ -283,8 +351,122 @@ async def health():
         "tcp_reachable": tcp_ok,
         "tcp_endpoint": f"{TCP_HOST}:{TCP_PORT}",
         "cors_origins": ALLOWED_ORIGINS,
-        "version": "2.1.0",
+        "active_sessions": len(PIBT_CONNECTIONS),
+        "pruned_sessions": pruned,
+        "version": "2.2.0",
     }
+
+
+@app.get("/api/sessions/pibt/healthz")
+async def pibt_healthz():
+    pruned = _prune_pibt_connections()
+    return {
+        "ok": True,
+        "relay": "pibt-tcp",
+        "active_sessions": len(PIBT_CONNECTIONS),
+        "pruned_sessions": pruned,
+        "tcp_endpoint": f"{TCP_HOST}:{TCP_PORT}",
+        "version": "2.2.0",
+    }
+
+
+@app.post("/api/sessions/pibt/hello")
+async def pibt_session_hello(req: HelloRequest):
+    session_id = req.session_id.strip()
+    if not session_id:
+        raise HTTPException(400, detail="session_id is required")
+
+    _prune_pibt_connections()
+    _remove_pibt_connection(session_id)
+
+    msg = {
+        "type": "hello",
+        "sessionId": session_id,
+        "teamSize": req.team_size,
+        "map": req.map.model_dump(),
+    }
+
+    connection: PibtRelayConnection | None = None
+    try:
+        tcp_socket = await asyncio.to_thread(_connect_new_pibt_session)
+        connection = PibtRelayConnection(tcp_socket)
+        resp = await asyncio.to_thread(connection.exchange, json.dumps(msg), 70.0)
+        if resp.get("type") != "hello_ack":
+            connection.close()
+            raise HTTPException(502, detail=resp)
+        with PIBT_CONNECTIONS_LOCK:
+            PIBT_CONNECTIONS[session_id] = connection
+        return JSONResponse(resp)
+    except HTTPException:
+        raise
+    except (OSError, ValueError, ConnectionError) as exc:
+        if connection is not None:
+            connection.close()
+        raise HTTPException(502, detail=f"PIBT relay hello failed: {exc}")
+
+
+@app.post("/api/sessions/pibt/plan-step")
+async def pibt_session_plan_step(req: PlanStepRequest):
+    session_id = req.session_id.strip()
+    with PIBT_CONNECTIONS_LOCK:
+        connection = PIBT_CONNECTIONS.get(session_id)
+    if connection is None:
+        raise HTTPException(404, detail="PIBT relay session was not found or expired")
+
+    msg = {
+        "type": "plan_step",
+        "sessionId": session_id,
+        "requestId": req.request_id,
+        "timestep": req.timestep,
+        "agents": [a.model_dump() for a in req.agents],
+    }
+    try:
+        resp = await asyncio.to_thread(connection.exchange, json.dumps(msg), 20.0)
+        return JSONResponse(resp)
+    except (OSError, ValueError, ConnectionError) as exc:
+        _remove_pibt_connection(session_id)
+        raise HTTPException(502, detail=f"PIBT relay plan-step failed: {exc}")
+
+
+@app.post("/api/sessions/pibt/reset")
+async def pibt_session_reset(req: ResetRequest):
+    session_id = req.session_id.strip()
+    with PIBT_CONNECTIONS_LOCK:
+        connection = PIBT_CONNECTIONS.get(session_id)
+    if connection is None:
+        raise HTTPException(404, detail="PIBT relay session was not found or expired")
+
+    msg = {
+        "type": "reset",
+        "sessionId": session_id,
+    }
+    try:
+        resp = await asyncio.to_thread(connection.exchange, json.dumps(msg), 5.0)
+        return JSONResponse(resp)
+    except (OSError, ValueError, ConnectionError) as exc:
+        _remove_pibt_connection(session_id)
+        raise HTTPException(502, detail=f"PIBT relay reset failed: {exc}")
+
+
+@app.post("/api/sessions/pibt/shutdown")
+async def pibt_session_shutdown(req: ShutdownRequest):
+    session_id = req.session_id.strip()
+    with PIBT_CONNECTIONS_LOCK:
+        connection = PIBT_CONNECTIONS.get(session_id)
+    if connection is None:
+        raise HTTPException(404, detail="PIBT relay session was not found or expired")
+
+    msg = {
+        "type": "shutdown",
+        "sessionId": session_id,
+    }
+    try:
+        resp = await asyncio.to_thread(connection.exchange, json.dumps(msg), 5.0)
+        return JSONResponse(resp)
+    except (OSError, ValueError, ConnectionError) as exc:
+        raise HTTPException(502, detail=f"PIBT relay shutdown failed: {exc}")
+    finally:
+        _remove_pibt_connection(session_id)
 
 
 @app.post("/plan")
