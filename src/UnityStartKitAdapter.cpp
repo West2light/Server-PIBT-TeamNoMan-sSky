@@ -117,10 +117,15 @@ const char* ActionToString(Action a)
     }
 }
 
+// G-2: NEVER declare `delta` (or any array derived from `cols`) as `static` here.
+// `cols` is map-specific and changes every session. A `static` local would bake
+// the first map's width for the whole process lifetime, causing all FW moves on
+// subsequent maps with different widths to use the wrong vertical stride.
+// (This was the root cause of the 1-of-5-maps standstill bug; fixed by removing `static`.)
 int NextLoc(const State& s, Action a, int cols)
 {
     // Orientation moves: east(0)=+1, south(1)=+cols, west(2)=-1, north(3)=-cols
-    static const int delta[4] = {1, cols, -1, -cols};
+    const int delta[4] = {1, cols, -1, -cols};
 
     switch (a)
     {

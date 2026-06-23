@@ -37,6 +37,7 @@ list(FILTER SOURCES EXCLUDE REGEX ".*/src/PibtTcpServer\\.cpp$")
 list(FILTER SOURCES EXCLUDE REGEX ".*/src/UnityStartKitAdapter\\.cpp$")
 list(FILTER SOURCES EXCLUDE REGEX ".*/src/PlannerSession\\.cpp$")
 list(FILTER SOURCES EXCLUDE REGEX ".*/src/epibt_smoke_main\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX ".*/src/dual_width_smoke_main\\.cpp$")
 
 
 # Find Boost
@@ -118,6 +119,19 @@ add_executable(
 target_include_directories(epibt_smoke_test PRIVATE inc default_planner ${Boost_INCLUDE_DIRS})
 target_link_libraries(epibt_smoke_test PRIVATE ${Boost_LIBRARIES})
 target_compile_definitions(epibt_smoke_test PRIVATE BOOST_ERROR_CODE_HEADER_ONLY PYTHON=${PYTHON_FLAG})
+
+# G-1: dual-width smoke test — catches `static delta` regression in NextLoc
+add_executable(
+    dual_width_smoke_test
+    src/dual_width_smoke_main.cpp
+    src/UnityStartKitAdapter.cpp
+    src/ActionModel.cpp
+    src/States.cpp
+    src/common.cpp
+)
+target_include_directories(dual_width_smoke_test PRIVATE inc default_planner ${Boost_INCLUDE_DIRS})
+target_link_libraries(dual_width_smoke_test PRIVATE ${Boost_LIBRARIES})
+target_compile_definitions(dual_width_smoke_test PRIVATE BOOST_ERROR_CODE_HEADER_ONLY PYTHON=${PYTHON_FLAG})
 
 
 add_custom_target(clean_all
