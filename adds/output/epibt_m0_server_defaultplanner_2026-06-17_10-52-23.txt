@@ -1,0 +1,163 @@
+2026-06-17 10:52:23.608 [INFO] [FileLogger] initialized path=adds/output/epibt_m0_server_defaultplanner_2026-06-17_10-52-23.txt
+2026-06-17 10:52:23.608 [INFO] [PibtTcpServer] listening host=0.0.0.0 port=7777 planner=DefaultPlanner logPath=adds/output/epibt_m0_server_defaultplanner_2026-06-17_10-52-23.txt
+2026-06-17 11:02:36.261 [INFO] [PibtTcpServer] client connected
+2026-06-17 11:02:36.265 [INFO] [PibtTcpServer] hello session=unity-4f7badd576aa4764a3fc6505489d2537 teamSize=6
+2026-06-17 11:02:36.265 [INFO] [PlannerSession] initialize begin session=unity-4f7badd576aa4764a3fc6505489d2537 preprocessMs=3000
+2026-06-17 11:02:36.266 [INFO] [PlannerSession] initialize ok session=unity-4f7badd576aa4764a3fc6505489d2537 agents=6 map=32x32 planner=DefaultPlanner
+2026-06-17 11:02:36.778 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=0 agents=6
+2026-06-17 11:02:36.779 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=0 timestep=0
+2026-06-17 11:02:36.859 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=0 timestep=0 agents=6 computeMs=80.023116 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:37.279 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=1 agents=6
+2026-06-17 11:02:37.279 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=1 timestep=1
+2026-06-17 11:02:37.359 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=1 timestep=1 agents=6 computeMs=80.019672 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:37.781 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=2 agents=6
+2026-06-17 11:02:37.781 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=2 timestep=2
+2026-06-17 11:02:37.861 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=2 timestep=2 agents=6 computeMs=80.012991 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:38.281 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=3 agents=6
+2026-06-17 11:02:38.281 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=3 timestep=3
+2026-06-17 11:02:38.361 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=3 timestep=3 agents=6 computeMs=80.036453 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:38.782 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=4 agents=6
+2026-06-17 11:02:38.783 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=4 timestep=4
+2026-06-17 11:02:38.863 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=4 timestep=4 agents=6 computeMs=80.030425 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:39.284 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=5 agents=6
+2026-06-17 11:02:39.285 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=5 timestep=5
+2026-06-17 11:02:39.365 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=5 timestep=5 agents=6 computeMs=80.011085 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:39.787 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=6 agents=6
+2026-06-17 11:02:39.787 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=6 timestep=6
+2026-06-17 11:02:39.867 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=6 timestep=6 agents=6 computeMs=80.020679 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:40.289 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=7 agents=6
+2026-06-17 11:02:40.289 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=7 timestep=7
+2026-06-17 11:02:40.369 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=7 timestep=7 agents=6 computeMs=80.009457 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:40.790 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=8 agents=6
+2026-06-17 11:02:40.790 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=8 timestep=8
+2026-06-17 11:02:40.870 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=8 timestep=8 agents=6 computeMs=80.023823 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:41.290 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=9 agents=6
+2026-06-17 11:02:41.290 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=9 timestep=9
+2026-06-17 11:02:41.371 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=9 timestep=9 agents=6 computeMs=80.015256 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:41.791 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=10 agents=6
+2026-06-17 11:02:41.791 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=10 timestep=10
+2026-06-17 11:02:41.871 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=10 timestep=10 agents=6 computeMs=80.025203 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:42.293 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=11 agents=6
+2026-06-17 11:02:42.293 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=11 timestep=11
+2026-06-17 11:02:42.373 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=11 timestep=11 agents=6 computeMs=80.008842 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:42.794 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=12 agents=6
+2026-06-17 11:02:42.795 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=12 timestep=12
+2026-06-17 11:02:42.875 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=12 timestep=12 agents=6 computeMs=80.035273 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:43.295 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=13 agents=6
+2026-06-17 11:02:43.295 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=13 timestep=13
+2026-06-17 11:02:43.375 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=13 timestep=13 agents=6 computeMs=80.006513 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:43.796 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=14 agents=6
+2026-06-17 11:02:43.796 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=14 timestep=14
+2026-06-17 11:02:43.876 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=14 timestep=14 agents=6 computeMs=80.019434 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:44.298 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=15 agents=6
+2026-06-17 11:02:44.298 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=15 timestep=15
+2026-06-17 11:02:44.378 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=15 timestep=15 agents=6 computeMs=80.013106 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:44.800 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=16 agents=6
+2026-06-17 11:02:44.800 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=16 timestep=16
+2026-06-17 11:02:44.880 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=16 timestep=16 agents=6 computeMs=80.019001 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:45.302 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=17 agents=6
+2026-06-17 11:02:45.303 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=17 timestep=17
+2026-06-17 11:02:45.383 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=17 timestep=17 agents=6 computeMs=80.017804 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:51.080 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=18 agents=6
+2026-06-17 11:02:51.080 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=18 timestep=18
+2026-06-17 11:02:51.160 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=18 timestep=18 agents=6 computeMs=80.027877 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:51.580 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=19 agents=6
+2026-06-17 11:02:51.580 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=19 timestep=19
+2026-06-17 11:02:51.660 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=19 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:51.660 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=19 timestep=19 agents=6 computeMs=80.012373 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:52.080 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=20 agents=6
+2026-06-17 11:02:52.080 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=20 timestep=20
+2026-06-17 11:02:52.160 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=20 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:52.160 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=20 timestep=20 agents=6 computeMs=80.015443 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:52.581 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=21 agents=6
+2026-06-17 11:02:52.581 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=21 timestep=21
+2026-06-17 11:02:52.661 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=21 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:52.661 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=21 timestep=21 agents=6 computeMs=80.011572 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:53.084 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=22 agents=6
+2026-06-17 11:02:53.084 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=22 timestep=22
+2026-06-17 11:02:53.164 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=22 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:53.164 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=22 timestep=22 agents=6 computeMs=80.013578 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:53.585 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=23 agents=6
+2026-06-17 11:02:53.585 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=23 timestep=23
+2026-06-17 11:02:53.665 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=23 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:53.665 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=23 timestep=23 agents=6 computeMs=80.017393 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:54.087 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=24 agents=6
+2026-06-17 11:02:54.087 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=24 timestep=24
+2026-06-17 11:02:54.167 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=24 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:54.167 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=24 timestep=24 agents=6 computeMs=80.017405 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:54.588 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=25 agents=6
+2026-06-17 11:02:54.588 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=25 timestep=25
+2026-06-17 11:02:54.668 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=25 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:54.668 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=25 timestep=25 agents=6 computeMs=80.011056 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:55.089 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=26 agents=6
+2026-06-17 11:02:55.089 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=26 timestep=26
+2026-06-17 11:02:55.169 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=26 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:55.169 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=26 timestep=26 agents=6 computeMs=80.022985 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:55.591 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=27 agents=6
+2026-06-17 11:02:55.591 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=27 timestep=27
+2026-06-17 11:02:55.671 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=27 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:55.671 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=27 timestep=27 agents=6 computeMs=80.017464 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:56.091 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=28 agents=6
+2026-06-17 11:02:56.091 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=28 timestep=28
+2026-06-17 11:02:56.171 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=28 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:56.172 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=28 timestep=28 agents=6 computeMs=80.011052 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:56.594 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=29 agents=6
+2026-06-17 11:02:56.594 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=29 timestep=29
+2026-06-17 11:02:56.674 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=29 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:56.674 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=29 timestep=29 agents=6 computeMs=80.017384 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:57.095 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=30 agents=6
+2026-06-17 11:02:57.095 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=30 timestep=30
+2026-06-17 11:02:57.175 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=30 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:57.175 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=30 timestep=30 agents=6 computeMs=80.010513 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:57.597 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=31 agents=6
+2026-06-17 11:02:57.597 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=31 timestep=31
+2026-06-17 11:02:57.677 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=31 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:57.677 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=31 timestep=31 agents=6 computeMs=80.020954 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:58.098 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=32 agents=6
+2026-06-17 11:02:58.098 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=32 timestep=32
+2026-06-17 11:02:58.178 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=32 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:58.178 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=32 timestep=32 agents=6 computeMs=80.013576 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:58.599 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=33 agents=6
+2026-06-17 11:02:58.599 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=33 timestep=33
+2026-06-17 11:02:58.679 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=33 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:58.679 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=33 timestep=33 agents=6 computeMs=80.010298 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:59.099 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=34 agents=6
+2026-06-17 11:02:59.099 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=34 timestep=34
+2026-06-17 11:02:59.179 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=34 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:59.180 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=34 timestep=34 agents=6 computeMs=80.023769 planner=DefaultPlanner timeout=false
+2026-06-17 11:02:59.601 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=35 agents=6
+2026-06-17 11:02:59.601 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=35 timestep=35
+2026-06-17 11:02:59.681 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=35 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:02:59.681 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=35 timestep=35 agents=6 computeMs=80.011165 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:00.101 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=36 agents=6
+2026-06-17 11:03:00.101 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=36 timestep=36
+2026-06-17 11:03:00.181 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=36 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:03:00.181 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=36 timestep=36 agents=6 computeMs=80.018864 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:00.606 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=37 agents=6
+2026-06-17 11:03:00.607 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=37 timestep=37
+2026-06-17 11:03:00.687 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=37 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:03:00.687 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=37 timestep=37 agents=6 computeMs=80.010684 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:01.108 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=38 agents=6
+2026-06-17 11:03:01.108 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=38 timestep=38
+2026-06-17 11:03:01.188 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=38 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:03:01.189 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=38 timestep=38 agents=6 computeMs=80.023982 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:01.609 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=39 agents=6
+2026-06-17 11:03:01.609 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=39 timestep=39
+2026-06-17 11:03:01.689 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=39 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:03:01.689 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=39 timestep=39 agents=6 computeMs=80.015995 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:02.111 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=40 agents=6
+2026-06-17 11:03:02.111 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=40 timestep=40
+2026-06-17 11:03:02.191 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=40 agent=2 loc=831 ori=0 rawAction=FW rawNextLoc=832 reason=fw_row_wrap
+2026-06-17 11:03:02.191 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=40 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:03:02.191 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=40 timestep=40 agents=6 computeMs=80.009268 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:02.613 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=41 agents=6
+2026-06-17 11:03:02.613 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=41 timestep=41
+2026-06-17 11:03:02.694 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=41 agent=2 loc=831 ori=0 rawAction=FW rawNextLoc=832 reason=fw_row_wrap
+2026-06-17 11:03:02.694 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=41 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:03:02.694 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=41 timestep=41 agents=6 computeMs=80.015236 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:03.114 [INFO] [PibtTcpServer] plan_step session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=42 agents=6
+2026-06-17 11:03:03.114 [INFO] [PlannerSession] plan begin session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=42 timestep=42
+2026-06-17 11:03:03.194 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=42 agent=2 loc=831 ori=0 rawAction=FW rawNextLoc=832 reason=fw_row_wrap
+2026-06-17 11:03:03.194 [WARN] [PlannerSession] sanitize session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=42 agent=5 loc=479 ori=0 rawAction=FW rawNextLoc=480 reason=fw_row_wrap
+2026-06-17 11:03:03.194 [INFO] [PlannerSession] plan ok session=unity-4f7badd576aa4764a3fc6505489d2537 requestId=42 timestep=42 agents=6 computeMs=80.022505 planner=DefaultPlanner timeout=false
+2026-06-17 11:03:03.510 [INFO] [PibtTcpServer] shutdown session=unity-4f7badd576aa4764a3fc6505489d2537
