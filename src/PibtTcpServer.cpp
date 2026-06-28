@@ -291,29 +291,10 @@ int PibtTcpServer::Run()
             " planner=DefaultPlanner" +
             " logPath=" + log_path);
 
-        std::thread client_thread;
-        std::shared_ptr<tcp::socket> current_socket;
-
-        for (;;)
-        {
-            auto new_socket = std::make_shared<tcp::socket>(io_context);
-            acceptor.accept(*new_socket);
-
-            if (current_socket) {
-                boost::system::error_code ec;
-                current_socket->shutdown(boost::asio::socket_base::shutdown_both, ec);
-                current_socket->close(ec); // forcefully interrupt the old blocking read
-            }
-
-            if (client_thread.joinable()) {
-                client_thread.join();
-            }
-
-            current_socket = new_socket;
-            client_thread = std::thread([current_socket]() {
-                HandleClient(*current_socket);
-            });
-        }
+        tcp::socket socket(io_context);
+        acceptor.accept(socket);
+        HandleClient(socket);
+        return 0;
     }
     catch (const std::exception& ex)
     {

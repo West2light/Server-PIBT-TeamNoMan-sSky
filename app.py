@@ -45,17 +45,15 @@ from pydantic import BaseModel, Field
 TCP_HOST = "127.0.0.1"
 TCP_PORT = int(os.environ.get("PIBT_TCP_PORT", "7777"))
 PIBT_BIN = os.environ.get("PIBT_BIN", "/usr/local/bin/pibt_tcp_server")
-SERVER_PROC: subprocess.Popen | None = None
 
-# Lock đảm bảo chỉ 1 request TCP tại 1 thời điểm
-# (pibt_tcp_server xử lý tuần tự theo unity_server_guide §7)
-_TCP_LOCK: asyncio.Lock | None = None
 PIBT_SESSION_TTL_SECONDS = int(os.environ.get("PIBT_SESSION_TTL_SECONDS", "300"))
 
 
 class PibtRelayConnection:
-    def __init__(self, tcp_socket: socket.socket):
+    def __init__(self, tcp_socket: socket.socket, process: subprocess.Popen, port: int):
         self.socket = tcp_socket
+        self.process = process
+        self.port = port
         self.buffer = bytearray()
         self.lock = threading.Lock()
         self.last_used = time.time()
@@ -83,6 +81,12 @@ class PibtRelayConnection:
             self.socket.close()
         except OSError:
             pass
+        if self.process and self.process.poll() is None:
+            self.process.terminate()
+            try:
+                self.process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
 
 
 PIBT_CONNECTIONS: dict[str, PibtRelayConnection] = {}
@@ -104,36 +108,6 @@ def _wait_tcp_ready(host: str, port: int, timeout: float = 15.0) -> bool:
     return False
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Spawn pibt_tcp_server khi container khởi động."""
-    global SERVER_PROC, _TCP_LOCK
-    _TCP_LOCK = asyncio.Lock()
-
-    if os.path.isfile(PIBT_BIN) and os.access(PIBT_BIN, os.X_OK):
-        SERVER_PROC = subprocess.Popen(
-            [PIBT_BIN, "--host", TCP_HOST, "--port", str(TCP_PORT)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        ready = _wait_tcp_ready(TCP_HOST, TCP_PORT, timeout=15.0)
-        if ready:
-            print(f"[startup] pibt_tcp_server sẵn sàng tại {TCP_HOST}:{TCP_PORT}")
-        else:
-            print("[startup] WARNING: pibt_tcp_server chưa lắng nghe sau 15s")
-    else:
-        print(f"[startup] WARNING: Binary không tìm thấy: {PIBT_BIN}")
-
-    yield  # ← app đang chạy
-
-    # Teardown
-    if SERVER_PROC and SERVER_PROC.poll() is None:
-        SERVER_PROC.terminate()
-        try:
-            SERVER_PROC.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            SERVER_PROC.kill()
-        print("[shutdown] pibt_tcp_server đã dừng")
 
 
 # ─────────────────────────────────────────────────────────────
@@ -147,7 +121,6 @@ app = FastAPI(
         "Client: Unity WebGL tại https://luminx.io.vn"
     ),
     version="2.2.0",
-    lifespan=lifespan,
 )
 
 # ─────────────────────────────────────────────────────────────
@@ -254,8 +227,25 @@ def _prune_pibt_connections(max_idle_seconds: int | None = None) -> int:
     return len(expired)
 
 
-def _connect_new_pibt_session() -> socket.socket:
-    return socket.create_connection((TCP_HOST, TCP_PORT), timeout=10.0)
+def _find_free_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((TCP_HOST, 0))
+        return s.getsockname()[1]
+
+def _connect_new_pibt_session() -> tuple[socket.socket, subprocess.Popen, int]:
+    port = _find_free_port()
+    proc = subprocess.Popen(
+        [PIBT_BIN, "--host", TCP_HOST, "--port", str(port)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    ready = _wait_tcp_ready(TCP_HOST, port, timeout=15.0)
+    if not ready:
+        proc.terminate()
+        proc.kill()
+        raise ConnectionError(f"PIBT server failed to bind on port {port}")
+    sock = socket.create_connection((TCP_HOST, port), timeout=10.0)
+    return sock, proc, port
 
 
 # ─────────────────────────────────────────────────────────────
@@ -337,19 +327,9 @@ async def health():
     """Kiểm tra binary + TCP server + cấu hình CORS."""
     pruned = _prune_pibt_connections()
     bin_ok = os.path.isfile(PIBT_BIN) and os.access(PIBT_BIN, os.X_OK)
-    proc_ok = SERVER_PROC is not None and SERVER_PROC.poll() is None
-    tcp_ok = False
-    try:
-        with socket.create_connection((TCP_HOST, TCP_PORT), timeout=1):
-            tcp_ok = True
-    except OSError:
-        pass
     return {
-        "status": "ok" if (bin_ok and proc_ok and tcp_ok) else "degraded",
+        "status": "ok" if bin_ok else "degraded",
         "binary_exists": bin_ok,
-        "process_alive": proc_ok,
-        "tcp_reachable": tcp_ok,
-        "tcp_endpoint": f"{TCP_HOST}:{TCP_PORT}",
         "cors_origins": ALLOWED_ORIGINS,
         "active_sessions": len(PIBT_CONNECTIONS),
         "pruned_sessions": pruned,
@@ -362,11 +342,10 @@ async def pibt_healthz():
     pruned = _prune_pibt_connections()
     return {
         "ok": True,
-        "relay": "pibt-tcp",
+        "relay": "pibt-tcp-multiprocess",
         "active_sessions": len(PIBT_CONNECTIONS),
         "pruned_sessions": pruned,
-        "tcp_endpoint": f"{TCP_HOST}:{TCP_PORT}",
-        "version": "2.2.0",
+        "version": "2.3.0",
     }
 
 
@@ -388,8 +367,8 @@ async def pibt_session_hello(req: HelloRequest):
 
     connection: PibtRelayConnection | None = None
     try:
-        tcp_socket = await asyncio.to_thread(_connect_new_pibt_session)
-        connection = PibtRelayConnection(tcp_socket)
+        tcp_socket, proc, port = await asyncio.to_thread(_connect_new_pibt_session)
+        connection = PibtRelayConnection(tcp_socket, proc, port)
         resp = await asyncio.to_thread(connection.exchange, json.dumps(msg), 70.0)
         if resp.get("type") != "hello_ack":
             connection.close()
@@ -469,102 +448,6 @@ async def pibt_session_shutdown(req: ShutdownRequest):
         _remove_pibt_connection(session_id)
 
 
-@app.post("/plan")
-async def plan_full_session(req: PlanRequest):
-    """
-    Full session trong 1 HTTP call: hello → plan_step → shutdown.
-
-    Được thiết kế cho Unity WebGL (luminx.io.vn) gọi mỗi timestep.
-    Lock đảm bảo tuần tự hoá với pibt_tcp_server (single-client §7).
-    """
-    session_id = str(uuid.uuid4())[:12]
-
-    hello_msg = {
-        "type": "hello",
-        "sessionId": session_id,
-        "teamSize": req.team_size,
-        "map": req.map.model_dump(),
-    }
-    plan_msg = {
-        "type": "plan_step",
-        "sessionId": session_id,
-        "requestId": 1,
-        "timestep": req.timestep,
-        "agents": [a.model_dump() for a in req.agents],
-    }
-    shutdown_msg = {
-        "type": "shutdown",
-        "sessionId": session_id,
-    }
-
-    try:
-        responses = await _tcp_session(
-            [hello_msg, plan_msg, shutdown_msg], timeout=15.0
-        )
-    except OSError as e:
-        raise HTTPException(
-            status_code=503,
-            detail=f"Không kết nối được pibt_tcp_server ({TCP_HOST}:{TCP_PORT}): {e}",
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-    result: dict[str, Any] = {"session_id": session_id}
-    for resp in responses:
-        t = resp.get("type", "")
-        if t == "hello_ack":
-            result["hello_ack"] = resp
-        elif t == "plan_result":
-            result["plan_result"] = resp
-        elif t == "shutdown_ack":
-            result["shutdown_ack"] = resp
-        else:
-            result.setdefault("other", []).append(resp)
-
-    return JSONResponse(result)
 
 
-# ── Endpoints thủ công (từng message riêng) ──────────────────
 
-@app.post("/tcp/hello")
-async def tcp_hello(req: HelloRequest):
-    """Gửi hello và nhận hello_ack."""
-    msg = {
-        "type": "hello",
-        "sessionId": req.session_id,
-        "teamSize": req.team_size,
-        "map": req.map.model_dump(),
-    }
-    try:
-        resp = await _tcp_send_recv(msg)
-    except OSError as e:
-        raise HTTPException(503, detail=str(e))
-    return JSONResponse(resp)
-
-
-@app.post("/tcp/plan_step")
-async def tcp_plan_step(req: PlanStepRequest):
-    """Gửi plan_step và nhận plan_result."""
-    msg = {
-        "type": "plan_step",
-        "sessionId": req.session_id,
-        "requestId": req.request_id,
-        "timestep": req.timestep,
-        "agents": [a.model_dump() for a in req.agents],
-    }
-    try:
-        resp = await _tcp_send_recv(msg, timeout=10.0)
-    except OSError as e:
-        raise HTTPException(503, detail=str(e))
-    return JSONResponse(resp)
-
-
-@app.post("/tcp/shutdown")
-async def tcp_shutdown(req: ShutdownRequest):
-    """Gửi shutdown và nhận shutdown_ack."""
-    msg = {"type": "shutdown", "sessionId": req.session_id}
-    try:
-        resp = await _tcp_send_recv(msg)
-    except OSError as e:
-        raise HTTPException(503, detail=str(e))
-    return JSONResponse(resp)
