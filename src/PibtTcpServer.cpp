@@ -1,4 +1,5 @@
 #include "PibtTcpServer.h"
+
 #include "FileLogger.h"
 #include "PlannerSession.h"
 #include "epibt.h"
@@ -14,6 +15,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <thread>
 
 using boost::asio::ip::tcp;
 using json = nlohmann::json;
@@ -38,83 +40,68 @@ std::string BuildLogFilePath()
     std::ostringstream oss;
     oss << "adds/output/epibt_m0_server_defaultplanner_"
         << std::put_time(&tm_value, "%Y-%m-%d_%H-%M-%S")
-        << ".txt";
+        << ".log";
     return oss.str();
 }
 
-json BuildHelloAck(
-    const json& request,
-    bool ok,
-    const std::string& planner_name,
-    const std::string& msg = "")
+void WriteJsonLine(tcp::socket& socket, const json& j)
 {
-    json r;
-    r["type"]      = "hello_ack";
-    r["sessionId"] = request.value("sessionId", "");
-    r["status"]    = ok ? "ok" : "error";
-    r["server"]    = "pibt_tcp_server";
-    r["planner"]   = planner_name;
-    if (!ok) r["message"] = msg;
-    // F-S2: echo map dims so client (F-U1) can assert what the server received
-    if (request.contains("map") && request["map"].is_object())
+    boost::system::error_code ec;
+    const std::string payload = j.dump() + "\n";
+    boost::asio::write(socket, boost::asio::buffer(payload), ec);
+    if (ec)
     {
-        const int w = request["map"].value("width",  0);
-        const int h = request["map"].value("height", 0);
-        r["width"]     = w;
-        r["height"]    = h;
-        r["cellCount"] = w * h;
+        std::cerr << "[pibt_tcp_server] write error: " << ec.message() << "\n";
+        throw boost::system::system_error(ec);
     }
+}
+
+json BuildHelloAck(const json& req, bool success, const std::string& planner, const std::string& error = "")
+{
+    json r         = json::object();
+    r["type"]      = "hello_ack";
+    r["sessionId"] = req.value("sessionId", "");
+    r["success"]   = success;
+    r["planner"]   = planner;
+    if (!success)
+        r["error"] = error;
     return r;
 }
 
-json BuildError(const std::string& type, const json& request, const std::string& message)
+json BuildResetAck(const json& req)
 {
-    json r;
-    r["type"]      = type;
-    r["sessionId"] = request.value("sessionId", "");
-    r["status"]    = "error";
-    r["message"]   = message;
-    return r;
-}
-
-json BuildShutdownAck(const json& request)
-{
-    json r;
-    r["type"]      = "shutdown_ack";
-    r["sessionId"] = request.value("sessionId", "");
-    r["status"]    = "ok";
-    r["message"]   = "closing session";
-    return r;
-}
-
-// S-R2: explicit reset ack — allows reusing a live connection for a new game session
-json BuildResetAck(const json& request)
-{
-    json r;
+    json r         = json::object();
     r["type"]      = "reset_ack";
-    r["sessionId"] = request.value("sessionId", "");
-    r["status"]    = "ok";
-    r["message"]   = "session state cleared";
+    r["sessionId"] = req.value("sessionId", "");
+    r["success"]   = true;
     return r;
 }
 
-void WriteJsonLine(tcp::socket& socket, const json& payload)
+json BuildShutdownAck(const json& req)
 {
-    const std::string body = payload.dump() + "\n";
-    boost::asio::write(socket, boost::asio::buffer(body));
+    json r         = json::object();
+    r["type"]      = "shutdown_ack";
+    r["sessionId"] = req.value("sessionId", "");
+    r["success"]   = true;
+    return r;
 }
 
-// S-R1: single authoritative "wipe all per-game state" function, called on every
-// session boundary (hello / reset / shutdown / EOF). Adding new globals? Add them here.
+json BuildError(const std::string& type, const json& req, const std::string& reason)
+{
+    json r         = json::object();
+    r["type"]      = type;
+    r["sessionId"] = req.value("sessionId", "");
+    r["success"]   = false;
+    r["error"]     = reason;
+    return r;
+}
+
 void ResetAllSessionState(std::unique_ptr<PlannerSession>& session)
 {
     session.reset();
     DefaultPlanner::reset();   // ResetPlannerGlobals: clears all namespace globals + reseeds mt1/srand
     EpibtPlanner::reset();     // ResetState: clears g_operations / g_last_agent_traces / etc.
-    FileLogger::Info("[PibtTcpServer] session state fully reset");
 }
-
-// ─── Per-client session handler ───────────────────────────────────────────────
 
 void HandleClient(tcp::socket& socket)
 {
@@ -127,55 +114,66 @@ void HandleClient(tcp::socket& socket)
     for (;;)
     {
         const std::size_t bytes = boost::asio::read_until(socket, buffer, '\n', ec);
-        if (ec == boost::asio::error::eof)
-        {
-            std::cout << "[pibt_tcp_server] client disconnected\n";
-            FileLogger::Info("[PibtTcpServer] client disconnected");
-            ResetAllSessionState(session);
-            return;
-        }
         if (ec)
         {
-            std::cerr << "[pibt_tcp_server] read error: " << ec.message() << "\n";
-            FileLogger::Error("[PibtTcpServer] socket read error: " + ec.message());
-            ResetAllSessionState(session);
-            return;
+            if (ec == boost::asio::error::eof || ec == boost::asio::error::connection_reset)
+            {
+                std::cout << "[pibt_tcp_server] client disconnected (EOF/reset)\n";
+                FileLogger::Info("[PibtTcpServer] client disconnected (EOF/reset)");
+            }
+            else if (ec == boost::asio::error::operation_aborted)
+            {
+                std::cout << "[pibt_tcp_server] client disconnected (operation_aborted)\n";
+                FileLogger::Info("[PibtTcpServer] client disconnected (operation_aborted)");
+            }
+            else
+            {
+                std::cerr << "[pibt_tcp_server] read error: " << ec.message() << "\n";
+                FileLogger::Warn("[PibtTcpServer] read error: " + ec.message());
+            }
+            break;
         }
 
-        std::istream    input(&buffer);
-        std::string     line;
-        line.reserve(bytes);
-        std::getline(input, line);
-        if (line.empty()) continue;
+        std::istream is(&buffer);
+        std::string  line;
+        std::getline(is, line);
+
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        if (line.empty())
+            continue;
 
         json request;
         try
         {
             request = json::parse(line);
         }
-        catch (const std::exception& ex)
+        catch (const json::parse_error& pe)
         {
-            std::cerr << "[pibt_tcp_server] invalid json: " << ex.what() << "\n";
-            FileLogger::Error(std::string("[PibtTcpServer] invalid json: ") + ex.what());
-            WriteJsonLine(socket, BuildError("protocol_error", json::object(), ex.what()));
+            std::cerr << "[pibt_tcp_server] parse error: " << pe.what() << "\n";
+            FileLogger::Warn(std::string("[PibtTcpServer] parse error: ") + pe.what());
+            WriteJsonLine(socket, BuildError("protocol_error", json::object(), "invalid json"));
             continue;
         }
 
         const std::string type = request.value("type", "");
 
-        // ── hello ─────────────────────────────────────────────────────────────
+        // ── hello (S-R1) ──────────────────────────────────────────────────────
         if (type == "hello")
         {
-            const std::string sid      = request.value("sessionId", "");
-            const int         teamSize = request.value("teamSize",  0);
+            const std::string sid = request.value("sessionId", "");
+            const int mapW        = request.value("map", json::object()).value("width", 0);
+            const int mapH        = request.value("map", json::object()).value("height", 0);
             std::cout << "[pibt_tcp_server] hello session=" << sid
-                      << " teamSize=" << teamSize << "\n";
-            FileLogger::Info(
-                "[PibtTcpServer] hello session=" + sid +
-                " teamSize=" + std::to_string(teamSize));
+                      << " map=" << mapW << "x" << mapH << "\n";
+
+            FileLogger::Info("[PibtTcpServer] hello session=" + sid +
+                             " map=" + std::to_string(mapW) + "x" + std::to_string(mapH));
 
             ResetAllSessionState(session);
             session = std::make_unique<PlannerSession>(sid);
+
             const bool ok = session->Initialize(request, /*preprocess_ms=*/3000);
 
             if (!ok)
@@ -190,13 +188,13 @@ void HandleClient(tcp::socket& socket)
             continue;
         }
 
-        // ── plan_step ─────────────────────────────────────────────────────────
+        // ── plan_step (C-R1) ──────────────────────────────────────────────────
         if (type == "plan_step")
         {
-            const std::string sid      = request.value("sessionId", "");
-            const int         reqId    = request.value("requestId", 0);
-            const std::size_t nAgents  = request.contains("agents") && request["agents"].is_array()
-                                         ? request["agents"].size() : 0;
+            const std::string sid = request.value("sessionId", "");
+            const int reqId       = request.value("requestId", 0);
+            const int nAgents     = request.value("agents", json::array()).size();
+
             std::cout << "[pibt_tcp_server] plan_step session=" << sid
                       << " requestId=" << reqId
                       << " agents=" << nAgents << "\n";
@@ -291,10 +289,29 @@ int PibtTcpServer::Run()
             " planner=DefaultPlanner" +
             " logPath=" + log_path);
 
-        tcp::socket socket(io_context);
-        acceptor.accept(socket);
-        HandleClient(socket);
-        return 0;
+        std::thread client_thread;
+        std::shared_ptr<tcp::socket> current_socket;
+
+        for (;;)
+        {
+            auto new_socket = std::make_shared<tcp::socket>(io_context);
+            acceptor.accept(*new_socket);
+
+            if (current_socket) {
+                boost::system::error_code ec;
+                current_socket->shutdown(boost::asio::socket_base::shutdown_both, ec);
+                current_socket->close(ec); // forcefully interrupt the old blocking read
+            }
+
+            if (client_thread.joinable()) {
+                client_thread.join();
+            }
+
+            current_socket = new_socket;
+            client_thread = std::thread([current_socket]() {
+                HandleClient(*current_socket);
+            });
+        }
     }
     catch (const std::exception& ex)
     {
