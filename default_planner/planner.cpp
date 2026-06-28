@@ -94,6 +94,10 @@ namespace DefaultPlanner{
     };
 
     void plan(int time_limit,vector<Action> & actions, SharedEnvironment* env){
+        if (ids.size() != env->num_of_agents) {
+            initialize(time_limit, env);
+        }
+
         TimePoint start_time = std::chrono::steady_clock::now();
         //cap the time for distance to goal heuristic table initialisation to half of the given time_limit;
 
