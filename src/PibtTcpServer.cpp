@@ -301,6 +301,7 @@ int PibtTcpServer::Run()
 
             if (current_socket) {
                 boost::system::error_code ec;
+                current_socket->shutdown(boost::asio::socket_base::shutdown_both, ec);
                 current_socket->close(ec); // forcefully interrupt the old blocking read
             }
 
