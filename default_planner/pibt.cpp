@@ -133,7 +133,7 @@ Action getAction(State& prev, int next_loc, SharedEnvironment* env){
 		return Action::W;
 	}
 	int diff = next_loc -prev.location;
-	int orientation;
+	int orientation = -1;
 	if (diff == 1){
 		orientation = 0;
 	}
@@ -146,6 +146,11 @@ Action getAction(State& prev, int next_loc, SharedEnvironment* env){
 	if (diff == -env->cols){
 		orientation = 3;
 	}
+	
+	if (orientation == -1) {
+		return Action::W;
+	}
+
 	if (orientation == prev.orientation){
 		return Action::FW;
 	}

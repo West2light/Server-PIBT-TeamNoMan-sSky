@@ -159,6 +159,16 @@ namespace DefaultPlanner{
             if (prev_states[i].location == decided[i].loc){
                 decided[i].state = DONE::DONE;
             }
+            else {
+                // If decided loc is no longer adjacent (due to teleport, drift, or blocked for too long)
+                // abort it and force a replan from current location.
+                int diff = decided[i].loc - prev_states[i].location;
+                if (diff != 1 && diff != -1 && diff != env->cols && diff != -env->cols) {
+                    decided[i].loc = prev_states[i].location;
+                    decided[i].state = DONE::DONE;
+                }
+            }
+
             if (decided[i].state == DONE::NOT_DONE){
                 decision.at(decided[i].loc) = i;
                 next_states[i] = State(decided[i].loc,-1,-1);
